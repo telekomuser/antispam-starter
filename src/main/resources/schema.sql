@@ -1,0 +1,3 @@
+CREATE SCHEMA IF NOT EXISTS antispam;
+CREATE TABLE IF NOT EXISTS antispam.antispam;
+CREATE TABLE IF NOT EXISTS antispam.query_log;
