@@ -1,10 +1,7 @@
 package com.intech.utils.antispam.services;
 
-import com.intech.utils.antispam.exceptions.TooManyRequests;
-import com.intech.utils.antispam.models.BlockedEntity;
-import com.intech.utils.antispam.models.CheckProperties;
-import com.intech.utils.antispam.models.Result;
-import com.intech.utils.antispam.models.Strategy;
+import com.intech.utils.antispam.annotations.Settings;
+import com.intech.utils.antispam.models.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,67 +20,67 @@ public class AntispamService {
 
     public void checkRequest(String userId,
                              String queryType,
-                             CheckProperties properties,
-                             CheckProperties repeatProperties) {
+                             Settings properties,
+                             Settings repeatProperties) {
         boolean checked = false;
 
 
-        if (properties != CheckProperties.NONE && StringUtils.hasLength(userId)) {
+        if (properties.blockCount() > 0 && StringUtils.hasLength(userId)) {
             checkUserIdRequest(userId, queryType, properties, repeatProperties);
             checked = true;
         }
 
-
         if (checked) {
-            logQuery(userId, queryType, Result.SUCCESS);
+            queryLogService.logQuery(userId, queryType, Result.SUCCESS);
         }
     }
 
-    public void logQuery(String userId, String queryType, Result result) {
-        queryLogService.logQuery(userId, queryType, result);
-    }
-
-
     private void checkUserIdRequest(String userId,
                                     String queryType,
-                                    CheckProperties properties,
-                                    CheckProperties repeatProperties) {
-        log.info("Check userId request {}", userId)  ;
+                                    Settings properties,
+                                    Settings repeatProperties) {
+        log.info("Check userId request {}", userId);
 
-        var blockPeriod = properties.getBlockPeriod();
-        var blockTimeUnit = properties.getBlockPeriodTimeUnit();
+        var blockPeriod = properties.blockPeriod();
+        var blockTimeUnit = properties.blockPeriodTimeUnit();
+        boolean repeat = false;
 
-        blockedSubscribersService.findBlockedSubscriberByUserId(userId).ifPresent(sub -> {
-            throwExceptionByClass(sub.getBlockType().getExtension());
+        blockedSubscribersService.findBlockedSubscriberByUserId(userId, queryType).ifPresent(sub -> {
+            if (sub.isRepeat()) {
+                throwExceptionByClass(repeatProperties.exception());
+            } else {
+                throwExceptionByClass(properties.exception());
+            }
         });
 
         var queriesCount = queryLogService.getUserIdQueriesCount(userId, queryType, LocalDateTime.now()
                 .minus(blockPeriod, blockTimeUnit));
-        log.info("checkMsisdnRequest({}) -> actual: {}, max: {}", userId, queriesCount, properties.getBlockCount());
-        if (queriesCount >= properties.getBlockCount()) {
-            if (repeatProperties != CheckProperties.NONE && blockedSubscribersService.wasBlockedByUserId(userId)) {
-                blockPeriod = repeatProperties.getBlockPeriod();
-                blockTimeUnit = repeatProperties.getBlockPeriodTimeUnit();
+        log.info("checkMsisdnRequest({}) -> actual: {}, max: {}", userId, queriesCount, properties.blockCount());
+        if (queriesCount >= properties.blockCount()) {
+            if (repeatProperties.blockCount() > 0 && blockedSubscribersService.wasBlockedByUserId(userId)) {
+                repeat = true;
+                blockPeriod = repeatProperties.blockPeriod();
+                blockTimeUnit = repeatProperties.blockPeriodTimeUnit();
 
             }
-            blockedSubscribersService.lock(BlockedEntity.builder().userId(userId).build(),
-                                           queryType,
-                                           blockPeriod,
-                                           blockTimeUnit);
-            throw new TooManyRequests();
-
+            BlockedEntity blocked = blockedSubscribersService.lock(userId, queryType, blockPeriod, blockTimeUnit, repeat);
+            if (blocked.isRepeat()) {
+                throwExceptionByClass(repeatProperties.exception());
+            } else {
+                throwExceptionByClass(properties.exception());
+            }
         }
     }
 
-    public void unlock(String userId) {
+    public void unlock(String userId, String queryType) {
         log.info("Unlock subscriber with userId: {}", userId);
-        deleteSubscriberQueries(userId);
-        blockedSubscribersService.unlock(userId);
+        deleteSubscriberQueries(userId, queryType);
+        blockedSubscribersService.unlock(userId, queryType);
     }
 
-    private void deleteSubscriberQueries(String userId) {
+    private void deleteSubscriberQueries(String userId, String queryType) {
         log.info("Find and delete subscriber queries for userid: {}", userId);
-        final var blockedSubscriberOpt = blockedSubscribersService.findBlockedSubscriberByUserId(userId);
+        final var blockedSubscriberOpt = blockedSubscribersService.findBlockedSubscriberByUserId(userId, queryType);
         blockedSubscriberOpt.ifPresent(blockedSubscriber -> queryLogService.deleteUserIdQueries(userId));
     }
 

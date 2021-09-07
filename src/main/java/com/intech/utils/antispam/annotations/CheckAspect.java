@@ -1,7 +1,8 @@
 package com.intech.utils.antispam.annotations;
 
+import com.intech.utils.antispam.annotations.Check;
+import com.intech.utils.antispam.annotations.Checks;
 import com.intech.utils.antispam.exceptions.EmptyUserIdException;
-import com.intech.utils.antispam.models.AvailableType;
 import com.intech.utils.antispam.services.AntispamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,22 +10,20 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.CodeSignature;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
 @Aspect
-@Component
+@Service
 @RequiredArgsConstructor
 public class CheckAspect {
 
-    private final HttpServletRequest request;
     private final AntispamService antispamService;
 
-    @Around("@annotation(Check)")
+    @Around("@annotation(check)")
     public Object check(ProceedingJoinPoint joinPoint, Check check) throws Throwable {
         process(joinPoint, check);
         return joinPoint.proceed();
@@ -43,14 +42,10 @@ public class CheckAspect {
         String [] parameterNames = codeSignature.getParameterNames();
         Object[] parameterValues = joinPoint.getArgs();
         for (int index = 0; index < parameterNames.length && index < parameterValues.length; index++) {
-            AvailableType type = AvailableType.findByName(parameterNames[index]);
-            if (type != null) {
-
-            }
             if (parameterNames[index].equals(check.variable())) {
                 var userId = (String) Optional.ofNullable(parameterValues[index])
                         .orElseThrow(EmptyUserIdException::new);
-                antispamService.checkRequest(userId, check.queryType(), check.strategy());
+                antispamService.checkRequest(userId, check.queryType(), check.properties(), check.repeatProperties());
             }
         }
     }

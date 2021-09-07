@@ -10,8 +10,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "query_log", schema = "antispam")
 public class QueryLogEntity {
 
     @Id
@@ -20,6 +22,7 @@ public class QueryLogEntity {
     private Long id;
     @Column(name = "user_id")
     private String userId;
+    @Column(name = "query_type")
     private String queryType;
     @Enumerated(EnumType.STRING)
     private Result result;
