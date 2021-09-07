@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * @author Афанасьев Евгений
  * @since 2021-09-07
  */
-@Target({ElementType.METHOD, ElementType.LOCAL_VARIABLE})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Check {
     /**
