@@ -24,13 +24,13 @@ import java.util.Properties;
 public class AntispamDatabaseConfiguration {
 
     @Bean
-    @ConfigurationProperties("datasource.antispam")
+    @ConfigurationProperties("spring.datasource")
     public DataSourceProperties antispamDatasourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
-    @ConfigurationProperties("datasource.antispam")
+    @ConfigurationProperties("spring.datasource")
     public DataSource antispamDBDataSource() {
         return antispamDatasourceProperties().initializeDataSourceBuilder()
                 .build();

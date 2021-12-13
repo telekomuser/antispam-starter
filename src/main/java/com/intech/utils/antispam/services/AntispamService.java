@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Service
@@ -57,13 +58,22 @@ public class AntispamService {
                 .minus(blockPeriod, blockTimeUnit));
         log.info("checkMsisdnRequest({}) -> actual: {}, max: {}", userId, queriesCount, properties.blockCount());
         if (queriesCount >= properties.blockCount()) {
+            var userBlockPeriod = properties.userBlockPeriod() > 0 ?
+                    properties.userBlockPeriod() :
+                    properties.blockPeriod();
+            var userBlockTimeUnit = properties.userBlockPeriodTimeUnit() != ChronoUnit.ERAS ?
+                    properties.userBlockPeriodTimeUnit() :
+                    properties.blockPeriodTimeUnit();
             if (repeatProperties.blockCount() > 0 && blockedSubscribersService.wasBlockedByUserId(userId)) {
                 repeat = true;
-                blockPeriod = repeatProperties.blockPeriod();
-                blockTimeUnit = repeatProperties.blockPeriodTimeUnit();
-
+                userBlockPeriod = repeatProperties.userBlockPeriod() > 0 ?
+                        repeatProperties.userBlockPeriod() :
+                        repeatProperties.blockPeriod();
+                userBlockTimeUnit = repeatProperties.userBlockPeriodTimeUnit() != ChronoUnit.ERAS ?
+                        repeatProperties.userBlockPeriodTimeUnit() :
+                        repeatProperties.blockPeriodTimeUnit();
             }
-            BlockedEntity blocked = blockedSubscribersService.lock(userId, queryType, blockPeriod, blockTimeUnit, repeat);
+            BlockedEntity blocked = blockedSubscribersService.lock(userId, queryType, userBlockPeriod, userBlockTimeUnit, repeat);
             if (blocked.isRepeat()) {
                 throwExceptionByClass(repeatProperties.exception());
             } else {

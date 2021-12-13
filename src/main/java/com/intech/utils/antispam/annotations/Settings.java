@@ -12,14 +12,22 @@ public @interface Settings {
       */
      int blockPeriod() default 0;
      /**
+      * Единица времени для {@link Settings#blockPeriod()}
+      */
+     ChronoUnit blockPeriodTimeUnit() default ChronoUnit.ERAS;
+     /**
+      * период блокировки пользователя
+      */
+     int userBlockPeriod() default 0;
+     /**
+      * Единица времени для {@link Settings#userBlockPeriod()}
+      */
+     ChronoUnit userBlockPeriodTimeUnit() default ChronoUnit.ERAS;
+     /**
       * Количество запросов разрешенных
       * за указанный промежуток времени
       */
      int blockCount() default 0;
-     /**
-      * Единица времени для {@link Settings#blockPeriod()}
-      */
-     ChronoUnit blockPeriodTimeUnit() default ChronoUnit.SECONDS;
      /**
       * Исключуние выбрасываемое в случае,
       * если пользователь находится в активной блокировке
