@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.models;
+package com.intech.utils.antispam.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import com.intech.utils.antispam.model.type.ResultType;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -25,7 +28,7 @@ public class QueryLogEntity {
     @Column(name = "query_type")
     private String queryType;
     @Enumerated(EnumType.STRING)
-    private Result result;
+    private ResultType result;
     @Column(name = "date_added")
     private LocalDateTime dateAdded;
 }

@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.annotations;
+package com.intech.utils.antispam.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

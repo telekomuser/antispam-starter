@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.models;
+package com.intech.utils.antispam.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
 
 @Data
 @Entity

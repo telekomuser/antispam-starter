@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.annotations;
+package com.intech.utils.antispam.annotation;
 
 import java.time.temporal.ChronoUnit;
 
@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
  */
 public @interface Settings {
      /**
-      * за какой период учитывать {@link com.intech.utils.antispam.models.QueryLogEntity}
+      * за какой период учитывать {@link com.intech.utils.antispam.model.entity.QueryLogEntity}
       */
      int blockPeriod() default 0;
      /**

@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.config;
+package com.intech.utils.antispam.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -17,9 +17,9 @@ import java.util.Properties;
 
 @Configuration
 @EnableJpaRepositories
-        (basePackages = {"com.intech.utils.antispam.models.repositories"},
-                entityManagerFactoryRef = "antispamDBEntityManagerFactory",
-                transactionManagerRef = "antispamDBTransactionManager")
+        (basePackages = {"com.intech.utils.antispam.model.repository"},
+         entityManagerFactoryRef = "antispamDBEntityManagerFactory",
+         transactionManagerRef = "antispamDBTransactionManager")
 @EnableTransactionManagement
 public class AntispamDatabaseConfiguration {
 
@@ -45,7 +45,7 @@ public class AntispamDatabaseConfiguration {
         builder.setJpaVendorAdapter(vendorAdapter);
         builder.setDataSource(antispamDBDataSource());
         builder.setJpaProperties(additionalProperties());
-        builder.setPackagesToScan("com.intech.utils.antispam.models");
+        builder.setPackagesToScan("com.intech.utils.antispam.model");
         builder.setPersistenceUnitName("antispamDBPersistenceUnit");
         return builder;
     }

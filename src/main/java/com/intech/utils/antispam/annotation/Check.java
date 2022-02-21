@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.annotations;
+package com.intech.utils.antispam.annotation;
 
 
 import java.lang.annotation.ElementType;
@@ -23,6 +23,8 @@ public @interface Check {
      * который подвержен проверке
      */
     String variable() default "";
+
+    String profile() default "";
 
     /**
      * Настройки первичной проверки и

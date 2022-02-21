@@ -1,7 +1,9 @@
-package com.intech.utils.antispam.services;
+package com.intech.utils.antispam.service;
 
-import com.intech.utils.antispam.annotations.Settings;
-import com.intech.utils.antispam.models.*;
+import com.intech.utils.antispam.annotation.Settings;
+import com.intech.utils.antispam.model.entity.BlockedEntity;
+import com.intech.utils.antispam.model.type.ResultType;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,18 +35,17 @@ public class AntispamService {
         }
 
         if (checked) {
-            queryLogService.logQuery(userId, queryType, Result.SUCCESS);
+            queryLogService.logQuery(userId, queryType, ResultType.SUCCESS);
         }
     }
 
     private void checkUserIdRequest(String userId,
-                                    String queryType,
-                                    Settings properties,
-                                    Settings repeatProperties) {
-        log.info("Check userId request {}", userId);
+                            String queryType,
+                            Settings properties,
+                            Settings repeatProperties) {
 
-        var blockPeriod = properties.blockPeriod();
-        var blockTimeUnit = properties.blockPeriodTimeUnit();
+        long blockPeriod = properties.blockPeriod();
+        ChronoUnit blockTimeUnit = properties.blockPeriodTimeUnit();
         boolean repeat = false;
 
         blockedSubscribersService.findBlockedSubscriberByUserId(userId, queryType).ifPresent(sub -> {
@@ -54,24 +56,18 @@ public class AntispamService {
             }
         });
 
-        var queriesCount = queryLogService.getUserIdQueriesCount(userId, queryType, LocalDateTime.now()
+        long queriesCount = queryLogService.getUserIdQueriesCount(userId, queryType, LocalDateTime.now()
                 .minus(blockPeriod, blockTimeUnit));
-        log.info("checkMsisdnRequest({}) -> actual: {}, max: {}", userId, queriesCount, properties.blockCount());
-        if (queriesCount >= properties.blockCount()) {
-            var userBlockPeriod = properties.userBlockPeriod() > 0 ?
-                    properties.userBlockPeriod() :
-                    properties.blockPeriod();
-            var userBlockTimeUnit = properties.userBlockPeriodTimeUnit() != ChronoUnit.ERAS ?
-                    properties.userBlockPeriodTimeUnit() :
-                    properties.blockPeriodTimeUnit();
-            if (repeatProperties.blockCount() > 0 && blockedSubscribersService.wasBlockedByUserId(userId)) {
+        log.info("checkMsisdnRequest({}) -> actual: {}, max: {}, between {} {}", 
+                userId, queriesCount, properties.blockCount(), blockPeriod, blockTimeUnit, repeat);
+        if (queriesCount > properties.blockCount()) {
+            int userBlockPeriod = properties.userBlockPeriod();
+            ChronoUnit userBlockTimeUnit = properties.userBlockPeriodTimeUnit();
+            if (blockedSubscribersService.wasBlockedByUserId(userId)) {
                 repeat = true;
-                userBlockPeriod = repeatProperties.userBlockPeriod() > 0 ?
-                        repeatProperties.userBlockPeriod() :
-                        repeatProperties.blockPeriod();
-                userBlockTimeUnit = repeatProperties.userBlockPeriodTimeUnit() != ChronoUnit.ERAS ?
-                        repeatProperties.userBlockPeriodTimeUnit() :
-                        repeatProperties.blockPeriodTimeUnit();
+                userBlockPeriod = repeatProperties.userBlockPeriod();
+                userBlockTimeUnit = repeatProperties.userBlockPeriodTimeUnit();
+                log.info("user {} was blocked -> repeat blocking on {} {}", userId, userBlockPeriod, userBlockTimeUnit);
             }
             BlockedEntity blocked = blockedSubscribersService.lock(userId, queryType, userBlockPeriod, userBlockTimeUnit, repeat);
             if (blocked.isRepeat()) {
@@ -90,7 +86,8 @@ public class AntispamService {
 
     private void deleteSubscriberQueries(String userId, String queryType) {
         log.info("Find and delete subscriber queries for userid: {}", userId);
-        final var blockedSubscriberOpt = blockedSubscribersService.findBlockedSubscriberByUserId(userId, queryType);
+        final Optional<BlockedEntity> blockedSubscriberOpt =
+            blockedSubscribersService.findBlockedSubscriberByUserId(userId, queryType);
         blockedSubscriberOpt.ifPresent(blockedSubscriber -> queryLogService.deleteUserIdQueries(userId));
     }
 

@@ -1,7 +1,5 @@
-package com.intech.utils.antispam.services;
+package com.intech.utils.antispam.service;
 
-import com.intech.utils.antispam.models.BlockedEntity;
-import com.intech.utils.antispam.models.repositories.BlockedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,6 +7,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+
+import com.intech.utils.antispam.model.entity.BlockedEntity;
+import com.intech.utils.antispam.model.repository.BlockedRepository;
 
 @Service
 @Slf4j
@@ -18,12 +19,13 @@ public class BlockedService {
     private final BlockedRepository blockedRepository;
 
     Optional<BlockedEntity> findBlockedSubscriberByUserId(String userId, String queryType) {
+        log.info("{}", LocalDateTime.now());
         return blockedRepository.findFirstByUserIdAndQueryTypeAndBlockEndAfterOrderByBlockEndDesc(userId, queryType, LocalDateTime.now());
 
     }
 
     BlockedEntity lock(String userId, String queryType, int blockPeriod, ChronoUnit blockTimeUnit, boolean repeat) {
-        log.info("Lock {} for {} {}", userId, blockPeriod, blockTimeUnit);
+        log.info("Lock {} for {} {}, was blocked ? {}", userId, blockPeriod, blockTimeUnit, repeat);
         final BlockedEntity blockedSubscriber = blockedRepository.findFirstByUserIdAndQueryType(userId, queryType)
                 .orElse(emptyBlockSubscriber(userId, queryType));
         blockedSubscriber.setUserId(userId);
@@ -40,8 +42,8 @@ public class BlockedService {
 
     void unlock(String userId, String queryType) {
         log.info("Trying unlock subscriber with userId: {}", userId);
-        blockedRepository.findFirstByUserIdAndBlockEndAfterAndQueryType(userId, LocalDateTime.now(), queryType)
-                .ifPresent(blockedRepository::deleteAll);
+        blockedRepository.deleteAll(
+            blockedRepository.findByUserIdAndBlockEndAfterAndQueryType(userId, LocalDateTime.now(), queryType));
     }
 
     boolean wasBlockedByUserId(String userId) {

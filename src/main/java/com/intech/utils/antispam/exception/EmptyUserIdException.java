@@ -1,4 +1,4 @@
-package com.intech.utils.antispam.exceptions;
+package com.intech.utils.antispam.exception;
 
 public class EmptyUserIdException extends RuntimeException {
 }

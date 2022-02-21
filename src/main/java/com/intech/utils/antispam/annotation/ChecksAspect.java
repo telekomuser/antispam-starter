@@ -1,11 +1,10 @@
-package com.intech.utils.antispam.annotations;
+package com.intech.utils.antispam.annotation;
 
-import com.intech.utils.antispam.annotations.Check;
-import com.intech.utils.antispam.annotations.Checks;
-import com.intech.utils.antispam.exceptions.EmptyUserIdException;
-import com.intech.utils.antispam.services.AntispamService;
+
+import com.intech.utils.antispam.exception.EmptyUserIdException;
+import com.intech.utils.antispam.service.AntispamService;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,11 +14,11 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Optional;
 
-@Slf4j
+
 @Aspect
 @Service
 @RequiredArgsConstructor
-public class CheckAspect {
+public class ChecksAspect {
 
     private final AntispamService antispamService;
 
@@ -31,9 +30,7 @@ public class CheckAspect {
 
     @Around("@annotation(checks)")
     public Object multipleCheck(ProceedingJoinPoint joinPoint, Checks checks) throws Throwable {
-        Arrays.stream(checks.checks()).forEach(check -> {
-            process(joinPoint, check);
-        });
+        Arrays.stream(checks.checks()).forEach(check -> process(joinPoint, check));
         return joinPoint.proceed();
     }
 
@@ -43,7 +40,7 @@ public class CheckAspect {
         Object[] parameterValues = joinPoint.getArgs();
         for (int index = 0; index < parameterNames.length && index < parameterValues.length; index++) {
             if (parameterNames[index].equals(check.variable())) {
-                var userId = (String) Optional.ofNullable(parameterValues[index])
+                String userId = (String) Optional.ofNullable(parameterValues[index])
                         .orElseThrow(EmptyUserIdException::new);
                 antispamService.checkRequest(userId, check.queryType(), check.properties(), check.repeatProperties());
             }

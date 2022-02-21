@@ -1,2 +1,2 @@
 # Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.intech.utils.antispam.config.AntispamDatabaseConfiguration,com.intech.utils.antispam.config.AntispamConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.intech.utils.antispam.configuration.AntispamDatabaseConfiguration,com.intech.utils.antispam.configuration.AntispamConfiguration

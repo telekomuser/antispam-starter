@@ -1,11 +1,12 @@
-package com.intech.utils.antispam.config;
+package com.intech.utils.antispam.configuration;
 
-import com.intech.utils.antispam.annotations.CheckAspect;
-import com.intech.utils.antispam.models.repositories.BlockedRepository;
-import com.intech.utils.antispam.models.repositories.QueryLogRepository;
-import com.intech.utils.antispam.services.AntispamService;
-import com.intech.utils.antispam.services.BlockedService;
-import com.intech.utils.antispam.services.QueryLogService;
+import com.intech.utils.antispam.annotation.ChecksAspect;
+import com.intech.utils.antispam.model.repository.BlockedRepository;
+import com.intech.utils.antispam.model.repository.QueryLogRepository;
+import com.intech.utils.antispam.service.AntispamService;
+import com.intech.utils.antispam.service.BlockedService;
+import com.intech.utils.antispam.service.QueryLogService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -40,8 +41,8 @@ public class AntispamConfiguration {
     }
 
     @Bean
-    public CheckAspect checkAspect(AntispamService antispamService) {
-        return new CheckAspect(antispamService);
+    public ChecksAspect checkAspect(AntispamService antispamService) {
+        return new ChecksAspect(antispamService);
     }
 
 }
