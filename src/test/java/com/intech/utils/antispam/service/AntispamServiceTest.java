@@ -1,21 +1,17 @@
 package com.intech.utils.antispam.service;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.annotation.Annotation;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 
 import com.intech.utils.antispam.annotation.Settings;
 import com.intech.utils.antispam.model.entity.BlockedEntity;
-import com.intech.utils.antispam.model.repository.inmemory.InmemoryBlockedRepository;
-import com.intech.utils.antispam.model.repository.inmemory.InmemoryQueryLogRepository;
+import com.intech.utils.antispam.model.repository.inmemory.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.*;
+import org.mockito.*;
 
 
 
@@ -85,7 +81,7 @@ class AntispamServiceTest {
     String userId = "212.212.22.1";
     String queryType = "test-ip";
 
-    LocalDateTime currentLocalDate = LocalDateTime.now()
+    OffsetDateTime currentLocalDate = OffsetDateTime.now()
         .plusMinutes(10)
         .plusSeconds(1);
 
@@ -93,8 +89,8 @@ class AntispamServiceTest {
       repeatCheck(10, userId, queryType, firstBlockIp(), defaultSettings());
       assert true;
     } catch(Block5minException exception) {
-      try (MockedStatic<LocalDateTime> topDateTimeUtilMock = Mockito.mockStatic(LocalDateTime.class)) {
-          topDateTimeUtilMock.when(() -> LocalDateTime.now()).thenReturn(currentLocalDate);
+      try (MockedStatic<OffsetDateTime> topDateTimeUtilMock = Mockito.mockStatic(OffsetDateTime.class)) {
+          topDateTimeUtilMock.when(() -> OffsetDateTime.now()).thenReturn(currentLocalDate);
           assertTrue(
             !blockedService.findBlockedSubscriberByUserId(userId, queryType).isPresent()
           );
@@ -107,15 +103,15 @@ class AntispamServiceTest {
     String userId = "212.212.22.1";
     String queryType = "test-ip";
 
-    LocalDateTime currentLocalDate = LocalDateTime.now().plusMinutes(10);
+    OffsetDateTime currentLocalDate = OffsetDateTime.now().plusMinutes(10);
 
     try {
       repeatCheck(10, userId, queryType, firstBlockIp(), secondBlockIp());
       assert true;
     } catch (Block5minException minuteException) {
 
-      try (MockedStatic<LocalDateTime> topDateTimeUtilMock = Mockito.mockStatic(LocalDateTime.class)) {
-        topDateTimeUtilMock.when(() -> LocalDateTime.now()).thenReturn(currentLocalDate);
+      try (MockedStatic<OffsetDateTime> topDateTimeUtilMock = Mockito.mockStatic(OffsetDateTime.class)) {
+        topDateTimeUtilMock.when(() -> OffsetDateTime.now()).thenReturn(currentLocalDate);
 
         try {
 
@@ -137,7 +133,7 @@ class AntispamServiceTest {
     String userId = "212.212.22.1";
     String queryType = "test-ip";
 
-    LocalDateTime currentLocalDate = LocalDateTime.now()
+    OffsetDateTime currentLocalDate = OffsetDateTime.now()
         .plusDays(1)
         .plusSeconds(1);
 
@@ -145,8 +141,8 @@ class AntispamServiceTest {
       repeatCheck(10, userId, queryType, firstBlockIp(), secondBlockIp());
       assert true;
     } catch (Block5minException minuteException) {
-      try (MockedStatic<LocalDateTime> topDateTimeUtilMock = Mockito.mockStatic(LocalDateTime.class)) {
-          topDateTimeUtilMock.when(() -> LocalDateTime.now()).thenReturn(currentLocalDate);
+      try (MockedStatic<OffsetDateTime> topDateTimeUtilMock = Mockito.mockStatic(OffsetDateTime.class)) {
+          topDateTimeUtilMock.when(() -> OffsetDateTime.now()).thenReturn(currentLocalDate);
           try {
             repeatCheck(10, userId, queryType, firstBlockIp(), secondBlockIp());
             assert true;

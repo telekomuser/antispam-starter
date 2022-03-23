@@ -1,15 +1,12 @@
 package com.intech.utils.antispam.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 import com.intech.utils.antispam.model.type.ResultType;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -30,5 +27,5 @@ public class QueryLogEntity {
     @Enumerated(EnumType.STRING)
     private ResultType result;
     @Column(name = "date_added")
-    private LocalDateTime dateAdded;
+    private OffsetDateTime dateAdded;
 }

@@ -1,16 +1,12 @@
 package com.intech.utils.antispam.configuration;
 
 import com.intech.utils.antispam.annotation.ChecksAspect;
-import com.intech.utils.antispam.model.repository.BlockedRepository;
-import com.intech.utils.antispam.model.repository.QueryLogRepository;
-import com.intech.utils.antispam.service.AntispamService;
-import com.intech.utils.antispam.service.BlockedService;
-import com.intech.utils.antispam.service.QueryLogService;
+import com.intech.utils.antispam.model.repository.*;
+import com.intech.utils.antispam.service.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 import javax.annotation.PostConstruct;
 

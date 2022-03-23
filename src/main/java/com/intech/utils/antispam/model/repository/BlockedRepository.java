@@ -3,9 +3,8 @@ package com.intech.utils.antispam.model.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 import com.intech.utils.antispam.model.entity.BlockedEntity;
 
@@ -14,10 +13,10 @@ public interface BlockedRepository extends JpaRepository<BlockedEntity, Long> {
 
     Optional<BlockedEntity> findFirstByUserIdAndQueryType(String userId, String queryType);
 
-    boolean existsByUserIdAndBlockStartAfter(String userId, LocalDateTime lastDay);
+    boolean existsByUserIdAndBlockStartAfter(String userId, OffsetDateTime lastDay);
 
-    Optional<BlockedEntity> findFirstByUserIdAndQueryTypeAndBlockEndAfterOrderByBlockEndDesc(String userId, String queryType, LocalDateTime currentDate);
+    Optional<BlockedEntity> findFirstByUserIdAndQueryTypeAndBlockEndAfterOrderByBlockEndDesc(String userId, String queryType, OffsetDateTime currentDate);
 
-    List<BlockedEntity> findByUserIdAndBlockEndAfterAndQueryType(String userId, LocalDateTime currentDate, String queryType);
+    List<BlockedEntity> findByUserIdAndBlockEndAfterAndQueryType(String userId, OffsetDateTime currentDate, String queryType);
 
 }
