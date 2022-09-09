@@ -60,7 +60,7 @@ public class AntispamService {
                 .minus(blockPeriod, blockTimeUnit));
         log.info("checkMsisdnRequest({}) -> actual: {}, max: {}, between {} {}", 
                 userId, queriesCount, properties.blockCount(), blockPeriod, blockTimeUnit, repeat);
-        if (queriesCount > properties.blockCount()) {
+        if (queriesCount >= properties.blockCount()) {
             int userBlockPeriod = properties.userBlockPeriod();
             ChronoUnit userBlockTimeUnit = properties.userBlockPeriodTimeUnit();
             if (blockedSubscribersService.wasBlockedByUserId(userId)) {
