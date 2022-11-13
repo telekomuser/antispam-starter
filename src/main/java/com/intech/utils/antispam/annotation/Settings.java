@@ -24,12 +24,12 @@ public @interface Settings {
       */
      ChronoUnit userBlockPeriodTimeUnit() default ChronoUnit.ERAS;
      /**
-      * Количество запросов разрешенных
+      * Количество запросов, разрешенных
       * за указанный промежуток времени
       */
      int blockCount() default 0;
      /**
-      * Исключуние выбрасываемое в случае,
+      * Исключение, выбрасываемое в случае,
       * если пользователь находится в активной блокировке
       */
      Class<? extends RuntimeException> exception() default RuntimeException.class;

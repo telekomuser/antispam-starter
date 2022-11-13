@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import com.intech.utils.antispam.model.type.ResultType;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -27,5 +27,5 @@ public class QueryLogEntity {
     @Enumerated(EnumType.STRING)
     private ResultType result;
     @Column(name = "date_added")
-    private OffsetDateTime dateAdded;
+    private LocalDateTime dateAdded;
 }

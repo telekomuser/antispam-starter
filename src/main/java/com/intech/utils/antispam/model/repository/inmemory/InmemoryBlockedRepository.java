@@ -3,7 +3,7 @@ package com.intech.utils.antispam.model.repository.inmemory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -186,7 +186,7 @@ public class InmemoryBlockedRepository implements BlockedRepository {
     }
 
     @Override
-    public boolean existsByUserIdAndBlockStartAfter(String userId, OffsetDateTime lastDay) {
+    public boolean existsByUserIdAndBlockStartAfter(String userId, LocalDateTime lastDay) {
         return findAll().stream()
                 .filter(block -> block.getUserId().equals(userId))
                 .anyMatch(block -> block.getBlockStart().isAfter(lastDay));
@@ -194,7 +194,7 @@ public class InmemoryBlockedRepository implements BlockedRepository {
 
     @Override
     public Optional<BlockedEntity> findFirstByUserIdAndQueryTypeAndBlockEndAfterOrderByBlockEndDesc(String userId,
-            String queryType, OffsetDateTime currentDate) {
+            String queryType, LocalDateTime currentDate) {
         return findAll().stream()
                 .filter(block -> block.getUserId().equals(userId))
                 .filter(block -> block.getQueryType().equals(queryType))
@@ -205,7 +205,7 @@ public class InmemoryBlockedRepository implements BlockedRepository {
 
     @Override
     public List<BlockedEntity> findByUserIdAndBlockEndAfterAndQueryType(String userId,
-            OffsetDateTime currentDate, String queryType) {
+            LocalDateTime currentDate, String queryType) {
         return findAll().stream()
                 .filter(block -> block.getUserId().equals(userId))
                 .filter(block -> block.getBlockEnd().isAfter(currentDate))

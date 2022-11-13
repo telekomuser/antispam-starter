@@ -3,7 +3,7 @@ package com.intech.utils.antispam.model.repository.inmemory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,7 +21,7 @@ public class InmemoryQueryLogRepository implements  QueryLogRepository {
     private final Map<Long, QueryLogEntity> repository = new ConcurrentHashMap<>();
     private final AtomicLong seq = new AtomicLong(0);
 
-    public long countAllByUserIdAndQueryTypeAndDateAddedAfterAndResult(String userId, String queryType, OffsetDateTime time, ResultType result) {
+    public long countAllByUserIdAndQueryTypeAndDateAddedAfterAndResult(String userId, String queryType, LocalDateTime time, ResultType result) {
         return findAll().stream()
                 .filter(log -> log.getUserId().equals(userId))
                 .filter(log -> log.getQueryType().equals(queryType))

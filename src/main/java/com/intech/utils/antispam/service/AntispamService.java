@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -56,7 +56,7 @@ public class AntispamService {
             }
         });
 
-        long queriesCount = queryLogService.getUserIdQueriesCount(userId, queryType, OffsetDateTime.now()
+        long queriesCount = queryLogService.getUserIdQueriesCount(userId, queryType, LocalDateTime.now()
                 .minus(blockPeriod, blockTimeUnit));
         log.info("checkMsisdnRequest({}) -> actual: {}, max: {}, between {} {}", 
                 userId, queriesCount, properties.blockCount(), blockPeriod, blockTimeUnit, repeat);

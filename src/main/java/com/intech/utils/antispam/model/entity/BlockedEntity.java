@@ -3,7 +3,8 @@ package com.intech.utils.antispam.model.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Data
@@ -21,7 +22,7 @@ public class BlockedEntity {
     @Column(name = "user_id")
     private String userId;
     @Column(name = "date_added")
-    private OffsetDateTime dateAdded;
+    private LocalDateTime dateAdded;
     @Column(name = "query_type")
     private String queryType;
     @Column(name = "block_period")
@@ -30,9 +31,9 @@ public class BlockedEntity {
     @Enumerated(EnumType.STRING)
     private ChronoUnit blockTimeUnit;
     @Column(name = "block_start")
-    private OffsetDateTime blockStart;
+    private LocalDateTime blockStart;
     @Column(name = "block_end")
-    private OffsetDateTime blockEnd;
+    private LocalDateTime blockEnd;
     @Column(name = "repeat")
     private boolean repeat;
 }

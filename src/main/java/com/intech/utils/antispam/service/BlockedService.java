@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ public class BlockedService {
     private final BlockedRepository blockedRepository;
 
     Optional<BlockedEntity> findBlockedSubscriberByUserId(String userId, String queryType) {
-        return blockedRepository.findFirstByUserIdAndQueryTypeAndBlockEndAfterOrderByBlockEndDesc(userId, queryType, OffsetDateTime.now());
+        return blockedRepository.findFirstByUserIdAndQueryTypeAndBlockEndAfterOrderByBlockEndDesc(userId, queryType, LocalDateTime.now());
 
     }
 
@@ -28,12 +28,12 @@ public class BlockedService {
         final BlockedEntity blockedSubscriber = blockedRepository.findFirstByUserIdAndQueryType(userId, queryType)
                 .orElse(emptyBlockSubscriber(userId, queryType));
         blockedSubscriber.setUserId(userId);
-        blockedSubscriber.setDateAdded(OffsetDateTime.now());
+        blockedSubscriber.setDateAdded(LocalDateTime.now());
         blockedSubscriber.setBlockTimeUnit(blockTimeUnit);
-        blockedSubscriber.setBlockStart(OffsetDateTime.now());
+        blockedSubscriber.setBlockStart(LocalDateTime.now());
         blockedSubscriber.setBlockPeriod(blockPeriod);
         blockedSubscriber.setRepeat(repeat);
-        blockedSubscriber.setBlockEnd(OffsetDateTime.now().plus(blockPeriod, blockTimeUnit));
+        blockedSubscriber.setBlockEnd(LocalDateTime.now().plus(blockPeriod, blockTimeUnit));
 
         return blockedRepository.save(blockedSubscriber);
 
@@ -42,11 +42,11 @@ public class BlockedService {
     void unlock(String userId, String queryType) {
         log.info("Trying unlock subscriber with userId: {}", userId);
         blockedRepository.deleteAll(
-            blockedRepository.findByUserIdAndBlockEndAfterAndQueryType(userId, OffsetDateTime.now(), queryType));
+            blockedRepository.findByUserIdAndBlockEndAfterAndQueryType(userId, LocalDateTime.now(), queryType));
     }
 
     boolean wasBlockedByUserId(String userId) {
-        return blockedRepository.existsByUserIdAndBlockStartAfter(userId, OffsetDateTime.now().minusHours(24));
+        return blockedRepository.existsByUserIdAndBlockStartAfter(userId, LocalDateTime.now().minusHours(24));
     }
 
     private BlockedEntity emptyBlockSubscriber(String userId, String queryType) {
